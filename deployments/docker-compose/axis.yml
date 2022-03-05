@@ -1,0 +1,51 @@
+services:
+  ipfs:
+    image: crossedbot/ipfsedge
+    command: "-c ${CLUSTER_SECRET}"
+    healthcheck:
+      test: ipfs-cluster-ctl status
+      interval: 1s
+      timeout: 3s
+      retries: 30
+  redis:
+    image: crossedbot/redisedge
+    healthcheck:
+      test: redis-cli -u redis://127.0.0.1:6379 ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
+  insights:
+    image: redislabs/redisinsight
+    depends_on:
+      redis:
+        condition: service_healthy
+    links:
+      - redis
+    ports:
+      - "${INSIGHTS_PORT}:8001"
+    volumes:
+      - redisinsight:/db
+  mongo:
+    image: mongo:latest
+  simpleauth:
+    image: crossedbot/simpleauth
+    depends_on:
+      - mongo
+    links:
+      - mongo
+    ports:
+      - "${AUTH_PORT}:8080"
+  pins:
+    image: crossedbot/axis
+    depends_on:
+      ipfs:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    links:
+      - redis
+      - simpleauth
+    ports:
+      - "${AXIS_PINS_PORT}:7070"
+volumes:
+    redisinsight: {}
