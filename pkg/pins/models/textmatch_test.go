@@ -14,7 +14,7 @@ func TestMatchString(t *testing.T) {
 
 func TestToTextMatch(t *testing.T) {
 	expected := TextMatchIExact
-	actual, err := ToTextMatch("iexact")
+	actual, err := ToTextMatch("iExact")
 	require.Nil(t, err)
 	require.Equal(t, expected, actual)
 }

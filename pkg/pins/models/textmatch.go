@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"strings"
 )
 
 const (
@@ -29,7 +30,7 @@ func (tm TextMatch) String() (match string) {
 
 func ToTextMatch(m string) (TextMatch, error) {
 	for i, tm := range TextMatchStrings {
-		if tm == m {
+		if strings.EqualFold(tm, m) {
 			return TextMatch(i), nil
 		}
 	}
