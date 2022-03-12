@@ -33,13 +33,10 @@ func TestPinWatcherRegister(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 	mockDb := mocks.NewMockPins(mockCtrl)
+	mockIpfsClient := mocks.NewMockClient(mockCtrl)
 	mockDb.EXPECT().
 		Get(pinStatus.Id).
 		Return(pinStatus, nil)
-	mockDb.EXPECT().
-		Patch(pinStatus.Id, map[string]interface{}{"status": "pinned"}).
-		Return(nil)
-	mockIpfsClient := mocks.NewMockClient(mockCtrl)
 	mockIpfsClient.EXPECT().
 		Status(ctx, cid, true).
 		Return(&clusterapi.GlobalPinInfo{
@@ -49,13 +46,23 @@ func TestPinWatcherRegister(t *testing.T) {
 				},
 			},
 		}, nil)
+	mockDb.EXPECT().
+		Patch(pinStatus.Id, map[string]interface{}{"status": "pinned"}).
+		Return(nil)
 	pw := &pinWatcher{
 		Mutex:  new(sync.Mutex),
 		ctx:    ctx,
 		client: mockIpfsClient,
 		db:     mockDb,
 	}
-	pw.Register(pinStatus, clusterapi.TrackerStatusPinned, 1*time.Second)
+	pw.Register(
+		pinStatus,
+		clusterapi.TrackerStatusPinned,
+		10*time.Millisecond,
+	)
+	// Sleep since the Register call will create a go routine to poll the
+	// pin's status
+	time.Sleep(100 * time.Millisecond)
 }
 
 func TestPinWatcherDeregister(t *testing.T) {
