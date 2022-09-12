@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	clusterapi "github.com/ipfs/ipfs-cluster/api"
-	cluster "github.com/ipfs/ipfs-cluster/api/rest/client"
+	clusterapi "github.com/ipfs-cluster/ipfs-cluster/api"
+	cluster "github.com/ipfs-cluster/ipfs-cluster/api/rest/client"
 
 	pinsdb "github.com/crossedbot/axis/pkg/pins/database"
 	"github.com/crossedbot/axis/pkg/pins/models"

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	clusterapi "github.com/ipfs/ipfs-cluster/api"
+	clusterapi "github.com/ipfs-cluster/ipfs-cluster/api"
 	"github.com/stretchr/testify/require"
 
 	"github.com/crossedbot/axis/pkg/mocks"

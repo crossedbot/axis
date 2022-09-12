@@ -9,7 +9,7 @@ import (
 
 	models "github.com/crossedbot/axis/pkg/pins/models"
 	gomock "github.com/golang/mock/gomock"
-	api "github.com/ipfs/ipfs-cluster/api"
+	api "github.com/ipfs-cluster/ipfs-cluster/api"
 )
 
 // MockPinner is a mock of Pinner interface.
