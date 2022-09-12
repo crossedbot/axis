@@ -7,9 +7,9 @@ import (
 	"net"
 	"strings"
 
+	clusterapi "github.com/ipfs-cluster/ipfs-cluster/api"
+	cluster "github.com/ipfs-cluster/ipfs-cluster/api/rest/client"
 	ipfscid "github.com/ipfs/go-cid"
-	clusterapi "github.com/ipfs/ipfs-cluster/api"
-	cluster "github.com/ipfs/ipfs-cluster/api/rest/client"
 	ma "github.com/multiformats/go-multiaddr"
 
 	"github.com/crossedbot/axis/pkg/pins/models"
@@ -69,15 +69,17 @@ func (p *pinner) Add(pin models.Pin) error {
 		}
 		origins = append(origins, m)
 	}
-	_, err = p.ipfsClient.Pin(p.ctx, cid, clusterapi.PinOptions{
-		ReplicationFactorMin: p.ReplicationFactorMin,
-		ReplicationFactorMax: p.ReplicationFactorMax,
-		Name:                 pin.Name,
-		Mode:                 p.PinMode,
-		ShardSize:            clusterapi.DefaultShardSize,
-		Metadata:             pin.Meta,
-		Origins:              origins,
-	})
+	_, err = p.ipfsClient.Pin(p.ctx, clusterapi.NewCid(cid),
+		clusterapi.PinOptions{
+			ReplicationFactorMin: p.ReplicationFactorMin,
+			ReplicationFactorMax: p.ReplicationFactorMax,
+			Name:                 pin.Name,
+			Mode:                 p.PinMode,
+			ShardSize:            clusterapi.DefaultShardSize,
+			Metadata:             pin.Meta,
+			Origins:              origins,
+		},
+	)
 	return err
 }
 
@@ -86,7 +88,7 @@ func (p *pinner) Remove(cid string) error {
 	if err != nil {
 		return err
 	}
-	_, err = p.ipfsClient.Unpin(p.ctx, d)
+	_, err = p.ipfsClient.Unpin(p.ctx, clusterapi.NewCid(d))
 	return err
 }
 

@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	clusterapi "github.com/ipfs-cluster/ipfs-cluster/api"
 	ipfscid "github.com/ipfs/go-cid"
-	clusterapi "github.com/ipfs/ipfs-cluster/api"
 	ma "github.com/multiformats/go-multiaddr"
 	"github.com/stretchr/testify/require"
 
@@ -28,7 +28,7 @@ func TestPinnerAdd(t *testing.T) {
 	defer mockCtrl.Finish()
 	mockIpfsClient := mocks.NewMockClient(mockCtrl)
 	mockIpfsClient.EXPECT().
-		Pin(ctx, cid, clusterapi.PinOptions{
+		Pin(ctx, clusterapi.NewCid(cid), clusterapi.PinOptions{
 			ReplicationFactorMin: DefaultReplicationFactorMin,
 			ReplicationFactorMax: DefaultReplicationFactorMax,
 			Name:                 pin.Name,
@@ -57,7 +57,7 @@ func TestPinnerRemove(t *testing.T) {
 	defer mockCtrl.Finish()
 	mockIpfsClient := mocks.NewMockClient(mockCtrl)
 	mockIpfsClient.EXPECT().
-		Unpin(ctx, cid)
+		Unpin(ctx, clusterapi.NewCid(cid))
 	p := &pinner{
 		ctx:        ctx,
 		ipfsClient: mockIpfsClient,
@@ -76,8 +76,8 @@ func TestDelegates(t *testing.T) {
 	mockIpfsClient := mocks.NewMockClient(mockCtrl)
 	mockIpfsClient.EXPECT().
 		ID(ctx).
-		Return(&clusterapi.ID{
-			IPFS: &clusterapi.IPFSID{
+		Return(clusterapi.ID{
+			IPFS: clusterapi.IPFSID{
 				Addresses: []clusterapi.Multiaddr{
 					{Multiaddr: multiaddr},
 				},

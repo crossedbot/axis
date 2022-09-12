@@ -9,10 +9,9 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	cid "github.com/ipfs/go-cid"
-	shell "github.com/ipfs/go-ipfs-api"
-	files "github.com/ipfs/go-ipfs-files"
-	api "github.com/ipfs/ipfs-cluster/api"
+	api "github.com/ipfs-cluster/ipfs-cluster/api"
+	go_ipfs_api "github.com/ipfs/go-ipfs-api"
+	go_ipfs_files "github.com/ipfs/go-ipfs-files"
 	peer "github.com/libp2p/go-libp2p-core/peer"
 )
 
@@ -40,7 +39,7 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 }
 
 // Add mocks base method.
-func (m *MockClient) Add(ctx context.Context, paths []string, params *api.AddParams, out chan<- *api.AddedOutput) error {
+func (m *MockClient) Add(ctx context.Context, paths []string, params api.AddParams, out chan<- api.AddedOutput) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Add", ctx, paths, params, out)
 	ret0, _ := ret[0].(error)
@@ -54,7 +53,7 @@ func (mr *MockClientMockRecorder) Add(ctx, paths, params, out interface{}) *gomo
 }
 
 // AddMultiFile mocks base method.
-func (m *MockClient) AddMultiFile(ctx context.Context, multiFileR *files.MultiFileReader, params *api.AddParams, out chan<- *api.AddedOutput) error {
+func (m *MockClient) AddMultiFile(ctx context.Context, multiFileR *go_ipfs_files.MultiFileReader, params api.AddParams, out chan<- api.AddedOutput) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddMultiFile", ctx, multiFileR, params, out)
 	ret0, _ := ret[0].(error)
@@ -68,10 +67,10 @@ func (mr *MockClientMockRecorder) AddMultiFile(ctx, multiFileR, params, out inte
 }
 
 // Alerts mocks base method.
-func (m *MockClient) Alerts(ctx context.Context) ([]*api.Alert, error) {
+func (m *MockClient) Alerts(ctx context.Context) ([]api.Alert, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Alerts", ctx)
-	ret0, _ := ret[0].([]*api.Alert)
+	ret0, _ := ret[0].([]api.Alert)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -83,10 +82,10 @@ func (mr *MockClientMockRecorder) Alerts(ctx interface{}) *gomock.Call {
 }
 
 // Allocation mocks base method.
-func (m *MockClient) Allocation(ctx context.Context, ci cid.Cid) (*api.Pin, error) {
+func (m *MockClient) Allocation(ctx context.Context, ci api.Cid) (api.Pin, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Allocation", ctx, ci)
-	ret0, _ := ret[0].(*api.Pin)
+	ret0, _ := ret[0].(api.Pin)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -98,25 +97,24 @@ func (mr *MockClientMockRecorder) Allocation(ctx, ci interface{}) *gomock.Call {
 }
 
 // Allocations mocks base method.
-func (m *MockClient) Allocations(ctx context.Context, filter api.PinType) ([]*api.Pin, error) {
+func (m *MockClient) Allocations(ctx context.Context, filter api.PinType, out chan<- api.Pin) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Allocations", ctx, filter)
-	ret0, _ := ret[0].([]*api.Pin)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "Allocations", ctx, filter, out)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Allocations indicates an expected call of Allocations.
-func (mr *MockClientMockRecorder) Allocations(ctx, filter interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) Allocations(ctx, filter, out interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Allocations", reflect.TypeOf((*MockClient)(nil).Allocations), ctx, filter)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Allocations", reflect.TypeOf((*MockClient)(nil).Allocations), ctx, filter, out)
 }
 
 // GetConnectGraph mocks base method.
-func (m *MockClient) GetConnectGraph(arg0 context.Context) (*api.ConnectGraph, error) {
+func (m *MockClient) GetConnectGraph(arg0 context.Context) (api.ConnectGraph, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetConnectGraph", arg0)
-	ret0, _ := ret[0].(*api.ConnectGraph)
+	ret0, _ := ret[0].(api.ConnectGraph)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -128,10 +126,10 @@ func (mr *MockClientMockRecorder) GetConnectGraph(arg0 interface{}) *gomock.Call
 }
 
 // ID mocks base method.
-func (m *MockClient) ID(arg0 context.Context) (*api.ID, error) {
+func (m *MockClient) ID(arg0 context.Context) (api.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ID", arg0)
-	ret0, _ := ret[0].(*api.ID)
+	ret0, _ := ret[0].(api.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -143,10 +141,10 @@ func (mr *MockClientMockRecorder) ID(arg0 interface{}) *gomock.Call {
 }
 
 // IPFS mocks base method.
-func (m *MockClient) IPFS(arg0 context.Context) *shell.Shell {
+func (m *MockClient) IPFS(arg0 context.Context) *go_ipfs_api.Shell {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IPFS", arg0)
-	ret0, _ := ret[0].(*shell.Shell)
+	ret0, _ := ret[0].(*go_ipfs_api.Shell)
 	return ret0
 }
 
@@ -172,10 +170,10 @@ func (mr *MockClientMockRecorder) MetricNames(ctx interface{}) *gomock.Call {
 }
 
 // Metrics mocks base method.
-func (m *MockClient) Metrics(ctx context.Context, name string) ([]*api.Metric, error) {
+func (m *MockClient) Metrics(ctx context.Context, name string) ([]api.Metric, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Metrics", ctx, name)
-	ret0, _ := ret[0].([]*api.Metric)
+	ret0, _ := ret[0].([]api.Metric)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -187,10 +185,10 @@ func (mr *MockClientMockRecorder) Metrics(ctx, name interface{}) *gomock.Call {
 }
 
 // PeerAdd mocks base method.
-func (m *MockClient) PeerAdd(ctx context.Context, pid peer.ID) (*api.ID, error) {
+func (m *MockClient) PeerAdd(ctx context.Context, pid peer.ID) (api.ID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PeerAdd", ctx, pid)
-	ret0, _ := ret[0].(*api.ID)
+	ret0, _ := ret[0].(api.ID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -216,25 +214,24 @@ func (mr *MockClientMockRecorder) PeerRm(ctx, pid interface{}) *gomock.Call {
 }
 
 // Peers mocks base method.
-func (m *MockClient) Peers(arg0 context.Context) ([]*api.ID, error) {
+func (m *MockClient) Peers(arg0 context.Context, arg1 chan<- api.ID) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Peers", arg0)
-	ret0, _ := ret[0].([]*api.ID)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "Peers", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Peers indicates an expected call of Peers.
-func (mr *MockClientMockRecorder) Peers(arg0 interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) Peers(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Peers", reflect.TypeOf((*MockClient)(nil).Peers), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Peers", reflect.TypeOf((*MockClient)(nil).Peers), arg0, arg1)
 }
 
 // Pin mocks base method.
-func (m *MockClient) Pin(ctx context.Context, ci cid.Cid, opts api.PinOptions) (*api.Pin, error) {
+func (m *MockClient) Pin(ctx context.Context, ci api.Cid, opts api.PinOptions) (api.Pin, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Pin", ctx, ci, opts)
-	ret0, _ := ret[0].(*api.Pin)
+	ret0, _ := ret[0].(api.Pin)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -246,10 +243,10 @@ func (mr *MockClientMockRecorder) Pin(ctx, ci, opts interface{}) *gomock.Call {
 }
 
 // PinPath mocks base method.
-func (m *MockClient) PinPath(ctx context.Context, path string, opts api.PinOptions) (*api.Pin, error) {
+func (m *MockClient) PinPath(ctx context.Context, path string, opts api.PinOptions) (api.Pin, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PinPath", ctx, path, opts)
-	ret0, _ := ret[0].(*api.Pin)
+	ret0, _ := ret[0].(api.Pin)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -261,10 +258,10 @@ func (mr *MockClientMockRecorder) PinPath(ctx, path, opts interface{}) *gomock.C
 }
 
 // Recover mocks base method.
-func (m *MockClient) Recover(ctx context.Context, ci cid.Cid, local bool) (*api.GlobalPinInfo, error) {
+func (m *MockClient) Recover(ctx context.Context, ci api.Cid, local bool) (api.GlobalPinInfo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Recover", ctx, ci, local)
-	ret0, _ := ret[0].(*api.GlobalPinInfo)
+	ret0, _ := ret[0].(api.GlobalPinInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -276,25 +273,24 @@ func (mr *MockClientMockRecorder) Recover(ctx, ci, local interface{}) *gomock.Ca
 }
 
 // RecoverAll mocks base method.
-func (m *MockClient) RecoverAll(ctx context.Context, local bool) ([]*api.GlobalPinInfo, error) {
+func (m *MockClient) RecoverAll(ctx context.Context, local bool, out chan<- api.GlobalPinInfo) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RecoverAll", ctx, local)
-	ret0, _ := ret[0].([]*api.GlobalPinInfo)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "RecoverAll", ctx, local, out)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // RecoverAll indicates an expected call of RecoverAll.
-func (mr *MockClientMockRecorder) RecoverAll(ctx, local interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) RecoverAll(ctx, local, out interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecoverAll", reflect.TypeOf((*MockClient)(nil).RecoverAll), ctx, local)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecoverAll", reflect.TypeOf((*MockClient)(nil).RecoverAll), ctx, local, out)
 }
 
 // RepoGC mocks base method.
-func (m *MockClient) RepoGC(ctx context.Context, local bool) (*api.GlobalRepoGC, error) {
+func (m *MockClient) RepoGC(ctx context.Context, local bool) (api.GlobalRepoGC, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RepoGC", ctx, local)
-	ret0, _ := ret[0].(*api.GlobalRepoGC)
+	ret0, _ := ret[0].(api.GlobalRepoGC)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -306,10 +302,10 @@ func (mr *MockClientMockRecorder) RepoGC(ctx, local interface{}) *gomock.Call {
 }
 
 // Status mocks base method.
-func (m *MockClient) Status(ctx context.Context, ci cid.Cid, local bool) (*api.GlobalPinInfo, error) {
+func (m *MockClient) Status(ctx context.Context, ci api.Cid, local bool) (api.GlobalPinInfo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Status", ctx, ci, local)
-	ret0, _ := ret[0].(*api.GlobalPinInfo)
+	ret0, _ := ret[0].(api.GlobalPinInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -321,25 +317,38 @@ func (mr *MockClientMockRecorder) Status(ctx, ci, local interface{}) *gomock.Cal
 }
 
 // StatusAll mocks base method.
-func (m *MockClient) StatusAll(ctx context.Context, filter api.TrackerStatus, local bool) ([]*api.GlobalPinInfo, error) {
+func (m *MockClient) StatusAll(ctx context.Context, filter api.TrackerStatus, local bool, out chan<- api.GlobalPinInfo) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "StatusAll", ctx, filter, local)
-	ret0, _ := ret[0].([]*api.GlobalPinInfo)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "StatusAll", ctx, filter, local, out)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // StatusAll indicates an expected call of StatusAll.
-func (mr *MockClientMockRecorder) StatusAll(ctx, filter, local interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) StatusAll(ctx, filter, local, out interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StatusAll", reflect.TypeOf((*MockClient)(nil).StatusAll), ctx, filter, local)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StatusAll", reflect.TypeOf((*MockClient)(nil).StatusAll), ctx, filter, local, out)
+}
+
+// StatusCids mocks base method.
+func (m *MockClient) StatusCids(ctx context.Context, cids []api.Cid, local bool, out chan<- api.GlobalPinInfo) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StatusCids", ctx, cids, local, out)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// StatusCids indicates an expected call of StatusCids.
+func (mr *MockClientMockRecorder) StatusCids(ctx, cids, local, out interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StatusCids", reflect.TypeOf((*MockClient)(nil).StatusCids), ctx, cids, local, out)
 }
 
 // Unpin mocks base method.
-func (m *MockClient) Unpin(ctx context.Context, ci cid.Cid) (*api.Pin, error) {
+func (m *MockClient) Unpin(ctx context.Context, ci api.Cid) (api.Pin, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Unpin", ctx, ci)
-	ret0, _ := ret[0].(*api.Pin)
+	ret0, _ := ret[0].(api.Pin)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -351,10 +360,10 @@ func (mr *MockClientMockRecorder) Unpin(ctx, ci interface{}) *gomock.Call {
 }
 
 // UnpinPath mocks base method.
-func (m *MockClient) UnpinPath(ctx context.Context, path string) (*api.Pin, error) {
+func (m *MockClient) UnpinPath(ctx context.Context, path string) (api.Pin, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UnpinPath", ctx, path)
-	ret0, _ := ret[0].(*api.Pin)
+	ret0, _ := ret[0].(api.Pin)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -366,10 +375,10 @@ func (mr *MockClientMockRecorder) UnpinPath(ctx, path interface{}) *gomock.Call 
 }
 
 // Version mocks base method.
-func (m *MockClient) Version(arg0 context.Context) (*api.Version, error) {
+func (m *MockClient) Version(arg0 context.Context) (api.Version, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Version", arg0)
-	ret0, _ := ret[0].(*api.Version)
+	ret0, _ := ret[0].(api.Version)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

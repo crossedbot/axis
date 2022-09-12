@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
+	clusterapi "github.com/ipfs-cluster/ipfs-cluster/api"
 	ipfscid "github.com/ipfs/go-cid"
-	clusterapi "github.com/ipfs/ipfs-cluster/api"
 	"github.com/stretchr/testify/require"
 
 	"github.com/crossedbot/axis/pkg/mocks"
@@ -40,10 +40,10 @@ func TestStatusTrackerPoll(t *testing.T) {
 		Return(nil)
 	mockIpfsClient := mocks.NewMockClient(mockCtrl)
 	mockIpfsClient.EXPECT().
-		Status(ctx, cid, true).
-		Return(&clusterapi.GlobalPinInfo{
-			PeerMap: map[string]*clusterapi.PinInfoShort{
-				"peer": &clusterapi.PinInfoShort{
+		Status(ctx, clusterapi.NewCid(cid), true).
+		Return(clusterapi.GlobalPinInfo{
+			PeerMap: map[string]clusterapi.PinInfoShort{
+				"peer": clusterapi.PinInfoShort{
 					Status: clusterapi.TrackerStatusPinned,
 				},
 			},

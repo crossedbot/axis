@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/crossedbot/common/golang/logger"
+	clusterapi "github.com/ipfs-cluster/ipfs-cluster/api"
+	cluster "github.com/ipfs-cluster/ipfs-cluster/api/rest/client"
 	ipfscid "github.com/ipfs/go-cid"
-	clusterapi "github.com/ipfs/ipfs-cluster/api"
-	cluster "github.com/ipfs/ipfs-cluster/api/rest/client"
 
 	pinsdb "github.com/crossedbot/axis/pkg/pins/database"
 	"github.com/crossedbot/axis/pkg/pins/models"
@@ -89,7 +89,7 @@ func (t *statusTracker) CheckStatus(target clusterapi.TrackerStatus) bool {
 		))
 		return false
 	}
-	gblPinInfo, err := t.client.Status(t.ctx, cid, true)
+	gblPinInfo, err := t.client.Status(t.ctx, clusterapi.NewCid(cid), true)
 	if err != nil {
 		logger.Error(fmt.Sprintf(
 			"Failed to get status: %s",

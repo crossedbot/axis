@@ -10,8 +10,8 @@ import (
 
 	"github.com/crossedbot/common/golang/config"
 	"github.com/google/uuid"
-	clusterapi "github.com/ipfs/ipfs-cluster/api"
-	cluster "github.com/ipfs/ipfs-cluster/api/rest/client"
+	clusterapi "github.com/ipfs-cluster/ipfs-cluster/api"
+	cluster "github.com/ipfs-cluster/ipfs-cluster/api/rest/client"
 	ma "github.com/multiformats/go-multiaddr"
 
 	"github.com/crossedbot/axis/pkg/auth"

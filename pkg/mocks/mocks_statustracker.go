@@ -9,7 +9,7 @@ import (
 	time "time"
 
 	gomock "github.com/golang/mock/gomock"
-	api "github.com/ipfs/ipfs-cluster/api"
+	api "github.com/ipfs-cluster/ipfs-cluster/api"
 )
 
 // MockStatusTracker is a mock of StatusTracker interface.
