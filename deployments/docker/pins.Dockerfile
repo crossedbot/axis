@@ -1,5 +1,5 @@
 ARG OS=debian:bullseye-slim
-ARG GOLANG_VERSION=1.17-bullseye
+ARG GOLANG_VERSION=1.19-bullseye
 ARG CGO=0
 ARG GOOS=linux
 ARG GOARCH=amd64
