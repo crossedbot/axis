@@ -26,7 +26,8 @@ type statusTracker struct {
 	client cluster.Client
 	pin    models.PinStatus
 	db     pinsdb.Pins
-	quit   chan struct{}
+	// TODO we should be closing this channel when quiting
+	quit chan struct{}
 }
 
 func NewStatusTracker(
