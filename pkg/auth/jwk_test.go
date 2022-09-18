@@ -5,16 +5,12 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"fmt"
 	"math/big"
 	"net"
-	"net/http"
 	"testing"
 	"time"
 
-	"github.com/crossedbot/simplejwt"
 	"github.com/crossedbot/simplejwt/algorithms"
-	middleware "github.com/crossedbot/simplemiddleware"
 	"github.com/stretchr/testify/require"
 )
 
@@ -107,23 +103,4 @@ func TestCertPemToRsaPublicKey(t *testing.T) {
 	actual, err := certPemToRsaPublicKey(b)
 	require.Nil(t, err)
 	require.Equal(t, publicKey, actual)
-}
-
-func TestGetUserIdFromRequest(t *testing.T) {
-	expected := "myuserid"
-	claims := simplejwt.CustomClaims{
-		middleware.ClaimUserId: expected,
-		"exp": time.Now().Local().Add(
-			time.Hour * time.Duration(1),
-		).Unix(),
-	}
-	tkn, err := simplejwt.New(claims, algorithms.AlgorithmRS256).
-		Sign([]byte(testPrivateKey))
-	require.Nil(t, err)
-	r := new(http.Request)
-	r.Header = make(http.Header)
-	r.Header.Set(middleware.AuthHeader, fmt.Sprintf("Bearer %s", tkn))
-	actual, err := getUserIdFromRequest(r)
-	require.Nil(t, err)
-	require.Equal(t, expected, actual)
 }

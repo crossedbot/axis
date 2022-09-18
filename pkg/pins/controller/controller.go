@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/crossedbot/common/golang/config"
+	middleware "github.com/crossedbot/simplemiddleware"
 	"github.com/google/uuid"
 	clusterapi "github.com/ipfs-cluster/ipfs-cluster/api"
 	cluster "github.com/ipfs-cluster/ipfs-cluster/api/rest/client"
@@ -104,7 +105,15 @@ var V1 = func() Controller {
 			ProtectorKey: cfg.IpfsClusterProtectorKey,
 			Timeout:      time.Duration(cfg.IpfsClusterTimeout) * time.Second,
 		})
-		auth.SetAuthenticatorAddr(cfg.AuthenticatorAddr)
+		if err != nil {
+			panic(fmt.Errorf(
+				"Controller: failed to create client for IPFS "+
+					"cluster ('%s') with error %s",
+				cfg.IpfsClusterApiAddr, err,
+			))
+		}
+		middleware.SetKeyFunc(auth.KeyFunc(cfg.AuthenticatorAddr))
+		middleware.SetErrFunc(auth.ErrFunc())
 		control = New(ctx, ipfsClient, db)
 	})
 	return control

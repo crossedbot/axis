@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 
-	jwt "github.com/crossedbot/simplejwt"
 	"github.com/crossedbot/simplejwt/jwk"
 	middleware "github.com/crossedbot/simplemiddleware"
 )
@@ -41,17 +40,4 @@ func certPemToRsaPublicKey(certPem []byte) (*rsa.PublicKey, error) {
 		return nil, err
 	}
 	return cert.PublicKey.(*rsa.PublicKey), nil
-}
-
-func getUserIdFromRequest(r *http.Request) (string, error) {
-	tknStr := authenticator.Extract(r)
-	tkn, err := jwt.Parse(tknStr)
-	if err != nil {
-		return "", err
-	}
-	userID, ok := tkn.Claims.Get(middleware.ClaimUserId).(string)
-	if !ok {
-		return "", ErrUserIdDataType
-	}
-	return userID, nil
 }

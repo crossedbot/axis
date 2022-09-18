@@ -144,8 +144,8 @@ github.com/crossedbot/common v0.0.0-20220911035328-a84c7bdd9808 h1:f/W+rKJp80JyK
 github.com/crossedbot/common v0.0.0-20220911035328-a84c7bdd9808/go.mod h1:KRIksGVfuJ4ohhFHy/2K+ExrO/0+uROI5UKGC4molMU=
 github.com/crossedbot/simplejwt v0.0.0-20220911040611-a01d5377f0c2 h1:1zJrI9+rcxIMQOZ/XL8P/rjODq2ncebVl6pTGwFVs1o=
 github.com/crossedbot/simplejwt v0.0.0-20220911040611-a01d5377f0c2/go.mod h1:j9jLM366x1Owj36dnf7ZrfhCAB2OicdGOpnrbxC93f8=
-github.com/crossedbot/simplemiddleware v0.0.0-20220911041252-7ca795fa3bd3 h1:ZTGbEQowqJkYgqHGduettxfSR1wxYO33ittRezOPw3k=
-github.com/crossedbot/simplemiddleware v0.0.0-20220911041252-7ca795fa3bd3/go.mod h1:8exR4JHTl7asfXECz97y03PPkGV6HbLPgC9Ia62TRpU=
+github.com/crossedbot/simplemiddleware v0.0.0-20220918043026-980d855c2c65 h1:He8zleL9Yv9EgkFHwXfEMbok5zkvTQpSd1bdxTEoLSE=
+github.com/crossedbot/simplemiddleware v0.0.0-20220918043026-980d855c2c65/go.mod h1:8exR4JHTl7asfXECz97y03PPkGV6HbLPgC9Ia62TRpU=
 github.com/cskr/pubsub v1.0.2/go.mod h1:/8MzYXk/NJAz782G8RPkFzXTZVu63VotefPnR9TIRis=
 github.com/davecgh/go-spew v0.0.0-20171005155431-ecdeabc65495/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
