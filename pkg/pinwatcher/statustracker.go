@@ -26,8 +26,7 @@ type statusTracker struct {
 	client cluster.Client
 	pin    models.PinStatus
 	db     pinsdb.Pins
-	// TODO we should be closing this channel when quiting
-	quit chan struct{}
+	quit   chan struct{}
 }
 
 func NewStatusTracker(
@@ -100,7 +99,9 @@ func (t *statusTracker) CheckStatus(target clusterapi.TrackerStatus) bool {
 	}
 	targetReached := false
 	for _, pinInfo := range gblPinInfo.PeerMap {
-		// Assume there is one in the map due to local being true
+		// Assume there is one in the map due to local being true (for
+		// now!). In the future, we should check for consensus among the
+		// cluster.
 		currStatus = pinInfo.Status.String()
 		if pinInfo.Status == target {
 			targetReached = true
@@ -117,7 +118,7 @@ func (t *statusTracker) CheckStatus(target clusterapi.TrackerStatus) bool {
 }
 
 func (t *statusTracker) Stop() {
-	t.quit <- struct{}{}
+	close(t.quit)
 }
 
 func (t *statusTracker) GetId() string {

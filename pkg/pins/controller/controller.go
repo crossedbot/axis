@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	clusterapi "github.com/ipfs-cluster/ipfs-cluster/api"
 	cluster "github.com/ipfs-cluster/ipfs-cluster/api/rest/client"
+	ipfscid "github.com/ipfs/go-cid"
 	ma "github.com/multiformats/go-multiaddr"
 
 	"github.com/crossedbot/axis/pkg/auth"
@@ -53,6 +54,7 @@ type Controller interface {
 // controller implements the Controller interface
 type controller struct {
 	ctx     context.Context
+	client  cluster.Client
 	db      pinsdb.Pins
 	pinner  pinner.Pinner
 	watcher pinwatcher.PinWatcher
@@ -124,6 +126,7 @@ var V1 = func() Controller {
 func New(ctx context.Context, client cluster.Client, db pinsdb.Pins) Controller {
 	return &controller{
 		ctx:     ctx,
+		client:  client,
 		db:      db,
 		pinner:  pinner.New(ctx, client),
 		watcher: pinwatcher.New(ctx, client, db),
@@ -164,6 +167,7 @@ func (c *controller) FindPins(
 }
 
 func (c *controller) GetPin(uid, id string) (models.PinStatus, error) {
+	c.UpdatePinStatus(uid, id)
 	// retrieve pin from datastore
 	ps, err := c.db.Get(id)
 	if err == pinsdb.ErrNotFound {
@@ -229,28 +233,38 @@ func (c *controller) PatchPin(uid, id string, pin models.Pin) (models.PinStatus,
 }
 
 func (c *controller) RemovePin(uid, id string) error {
-	ps, err := c.GetPin(uid, id)
+	ps, err := c.db.Get(id)
 	if err != nil {
 		return err
-	}
-	pins, err := c.FindPins(
-		uid,
-		[]string{ps.Pin.Cid},
-		"", "", "",
-		models.TextMatchExact,
-		[]models.Status{}, 10,
-	)
-	if err != nil {
-		return err
-	}
-	if pins.Count == 1 {
-		// Remove pin from IPFS if no one else is tracking it
-		if err := c.pinner.Remove(ps.Pin.Cid); err != nil {
-			return err
-		}
 	}
 	if err := c.db.Delete(id); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (c *controller) UpdatePinStatus(uid, id string) error {
+	ps, err := c.db.Get(id)
+	if err != nil {
+		return err
+	}
+	prevStatus := ps.Status
+	currStatus := prevStatus
+	cid, err := ipfscid.Decode(ps.Pin.Cid)
+	if err != nil {
+		return err
+	}
+	gblPinInfo, err := c.client.Status(c.ctx, clusterapi.NewCid(cid), true)
+	if err != nil {
+		return err
+	}
+	for _, pinInfo := range gblPinInfo.PeerMap {
+		currStatus = pinInfo.Status.String()
+	}
+	if currStatus != prevStatus {
+		c.db.Patch(ps.Id, map[string]interface{}{
+			"status": currStatus,
+		})
 	}
 	return nil
 }
