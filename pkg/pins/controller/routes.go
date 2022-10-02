@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/crossedbot/common/golang/server"
-	middleware "github.com/crossedbot/simplemiddleware"
+
+	"github.com/crossedbot/axis/pkg/auth"
 )
 
 // Route represents the route of the Pins HTTP API
@@ -19,35 +20,35 @@ type Route struct {
 var Routes = []Route{
 	// GetPin
 	Route{
-		middleware.Authorize(GetPin),
+		auth.Authorize(GetPin),
 		http.MethodGet,
 		"/pins/:id",
 		[]server.ResponseSetting{},
 	},
 	// FindPins
 	Route{
-		middleware.Authorize(FindPins),
+		auth.Authorize(FindPins),
 		http.MethodGet,
 		"/pins",
 		[]server.ResponseSetting{},
 	},
 	// CreatePin
 	Route{
-		middleware.Authorize(CreatePin),
+		auth.Authorize(CreatePin),
 		http.MethodPost,
 		"/pins",
 		[]server.ResponseSetting{},
 	},
 	// UpdatePin
 	Route{
-		middleware.Authorize(UpdatePin),
+		auth.Authorize(UpdatePin),
 		http.MethodPut,
 		"/pins/:id",
 		[]server.ResponseSetting{},
 	},
 	// UpdatePin (POST alternative)
 	Route{
-		middleware.Authorize(UpdatePin),
+		auth.Authorize(UpdatePin),
 		// XXX POST for compatibility with existing pinning api specs
 		http.MethodPost,
 		"/pins/:id",
@@ -55,14 +56,14 @@ var Routes = []Route{
 	},
 	// PatchPin
 	Route{
-		middleware.Authorize(PatchPin),
+		auth.Authorize(PatchPin),
 		http.MethodPatch,
 		"/pins/:id",
 		[]server.ResponseSetting{},
 	},
 	// RemovePin
 	Route{
-		middleware.Authorize(RemovePin),
+		auth.Authorize(RemovePin),
 		http.MethodDelete,
 		"/pins/:id",
 		[]server.ResponseSetting{},

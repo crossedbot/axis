@@ -237,6 +237,7 @@ func (c *controller) RemovePin(uid, id string) error {
 	if err != nil {
 		return err
 	}
+	c.pinner.Remove(ps.Pin.Cid)
 	if err := c.db.Delete(id); err != nil {
 		return err
 	}

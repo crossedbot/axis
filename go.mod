@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/RediSearch/redisearch-go v1.1.1
 	github.com/crossedbot/common v0.0.0-20220911035328-a84c7bdd9808
+	github.com/crossedbot/simpleauth v0.0.0-20221002144336-b0f871fe0d3b
 	github.com/crossedbot/simplejwt v0.0.0-20220911040611-a01d5377f0c2
 	github.com/crossedbot/simplemiddleware v0.0.0-20220918043026-980d855c2c65
 	github.com/golang/mock v1.6.0

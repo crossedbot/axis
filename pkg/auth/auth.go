@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/crossedbot/common/golang/server"
+	"github.com/crossedbot/simpleauth/pkg/grants"
 	middleware "github.com/crossedbot/simplemiddleware"
 
 	"github.com/crossedbot/axis/pkg/pins/models"
@@ -40,4 +41,19 @@ var ErrFunc = func() middleware.ErrFunc {
 			err.Error(),
 		), http.StatusUnauthorized)
 	}
+}
+
+func Authorize(handler server.Handler) server.Handler {
+	h := func(w http.ResponseWriter, r *http.Request, p server.Parameters) {
+		err := grants.ContainsGrant(grants.GrantAuthenticated, r)
+		if err != nil {
+			server.JsonResponse(w, models.NewFailure(
+				server.ErrUnauthorizedCode,
+				ErrUserForbidden.Error(),
+			), http.StatusForbidden)
+			return
+		}
+		handler(w, r, p)
+	}
+	return middleware.Authorize(h)
 }
