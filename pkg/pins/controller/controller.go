@@ -61,9 +61,10 @@ type controller struct {
 }
 
 type Config struct {
-	DatabaseAddr        string `toml:"database_addr"`
-	AuthenticatorAddr   string `toml:"authenticator_addr"`
-	DropDatabaseOnStart bool   `toml:"drop_database_on_start"`
+	DatabaseAddr         string   `toml:"database_addr"`
+	AuthenticatorAddr    string   `toml:"authenticator_addr"`
+	AuthenticationGrants []string `toml:"authentication_grants"`
+	DropDatabaseOnStart  bool     `toml:"drop_database_on_start"`
 
 	// IPFS configuration
 	IpfsClusterSsl          bool   `toml:"ipfs_cluster_ssl"`
@@ -73,11 +74,11 @@ type Config struct {
 	IpfsClusterTimeout      int    `toml:"ipfs_cluster_timeout"` // in seconds
 }
 
-// control is a singleton of a Controller and can be accessed via the V1
+// control is a singleton of a Controller and can be accessed via the Ctrl
 // function
 var control Controller
 var controllerOnce sync.Once
-var V1 = func() Controller {
+var Ctrl = func() Controller {
 	// initialize the controller only once
 	controllerOnce.Do(func() {
 		var cfg Config
@@ -116,6 +117,7 @@ var V1 = func() Controller {
 		}
 		middleware.SetKeyFunc(auth.KeyFunc(cfg.AuthenticatorAddr))
 		middleware.SetErrFunc(auth.ErrFunc())
+		auth.SetAuthGrants(cfg.AuthenticationGrants)
 		control = New(ctx, ipfsClient, db)
 	})
 	return control

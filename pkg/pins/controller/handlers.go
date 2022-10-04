@@ -125,7 +125,7 @@ func FindPins(w http.ResponseWriter, r *http.Request, p server.Parameters) {
 			return
 		}
 	}
-	pins, err := V1().FindPins(
+	pins, err := Ctrl().FindPins(
 		uid, cids, name,
 		before, after, match,
 		statuses, limit,
@@ -153,7 +153,7 @@ func GetPin(w http.ResponseWriter, r *http.Request, p server.Parameters) {
 		), http.StatusBadRequest)
 		return
 	}
-	pinStatus, err := V1().GetPin(uid, id)
+	pinStatus, err := Ctrl().GetPin(uid, id)
 	if err == ErrorPinNotFound {
 		server.JsonResponse(w, models.NewFailure(
 			models.ErrProcessingRequestCode,
@@ -184,7 +184,7 @@ func CreatePin(w http.ResponseWriter, r *http.Request, p server.Parameters) {
 		), http.StatusBadRequest)
 		return
 	}
-	pinStatus, err := V1().CreatePin(uid, pin)
+	pinStatus, err := Ctrl().CreatePin(uid, pin)
 	if err != nil {
 		logger.Error(err)
 		server.JsonResponse(w, models.NewFailure(
@@ -217,7 +217,7 @@ func UpdatePin(w http.ResponseWriter, r *http.Request, p server.Parameters) {
 		), http.StatusBadRequest)
 		return
 	}
-	pinStatus, err := V1().UpdatePin(uid, id, pin)
+	pinStatus, err := Ctrl().UpdatePin(uid, id, pin)
 	if err != nil {
 		server.JsonResponse(w, models.NewFailure(
 			models.ErrProcessingRequestCode,
@@ -249,7 +249,7 @@ func PatchPin(w http.ResponseWriter, r *http.Request, p server.Parameters) {
 		), http.StatusBadRequest)
 		return
 	}
-	pinStatus, err := V1().PatchPin(uid, id, pin)
+	pinStatus, err := Ctrl().PatchPin(uid, id, pin)
 	if err != nil {
 		server.JsonResponse(w, models.NewFailure(
 			models.ErrProcessingRequestCode,
@@ -273,7 +273,7 @@ func RemovePin(w http.ResponseWriter, r *http.Request, p server.Parameters) {
 		), http.StatusBadRequest)
 		return
 	}
-	err := V1().RemovePin(uid, id)
+	err := Ctrl().RemovePin(uid, id)
 	if err != nil {
 		server.JsonResponse(w, models.NewFailure(
 			models.ErrProcessingRequestCode,

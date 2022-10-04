@@ -59,7 +59,7 @@ func run(ctx context.Context) error {
 		return err
 	}
 	// Setup server, and wait and close
-	controller.V1()
+	controller.Ctrl()
 	srv := newServer(c)
 	if err := srv.Start(); err != nil {
 		return err

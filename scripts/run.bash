@@ -60,6 +60,7 @@ write_timeout=30
 
 database_addr="${db_addr}"
 authenticator_addr="${auth_addr}"
+authentication_grants=["authenticated"]
 
 ipfs_cluster_ssl=false
 ipfs_cluster_no_verify_cert=false
