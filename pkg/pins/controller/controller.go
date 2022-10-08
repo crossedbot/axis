@@ -85,12 +85,20 @@ var Ctrl = func() Controller {
 		if err := config.Load(&cfg); err != nil {
 			panic(err)
 		}
+		if len(cfg.AuthenticationGrants) > 0 {
+			err := auth.SetAuthGrants(cfg.AuthenticationGrants)
+			if err != nil {
+				panic(fmt.Errorf(
+					"Controller: failed to set custom authentication grants with error: %s",
+					err,
+				))
+			}
+		}
 		ctx := context.Background()
 		db, err := pinsdb.New(ctx, cfg.DatabaseAddr, cfg.DropDatabaseOnStart)
 		if err != nil {
 			panic(fmt.Errorf(
-				"Controller: failed to connect to database at "+
-					"address ('%s') with error: %s",
+				"Controller: failed to connect to database at address ('%s') with error: %s",
 				cfg.DatabaseAddr, err,
 			))
 		}
@@ -110,14 +118,12 @@ var Ctrl = func() Controller {
 		})
 		if err != nil {
 			panic(fmt.Errorf(
-				"Controller: failed to create client for IPFS "+
-					"cluster ('%s') with error %s",
+				"Controller: failed to create client for IPFS cluster ('%s') with error %s",
 				cfg.IpfsClusterApiAddr, err,
 			))
 		}
 		middleware.SetKeyFunc(auth.KeyFunc(cfg.AuthenticatorAddr))
 		middleware.SetErrFunc(auth.ErrFunc())
-		auth.SetAuthGrants(cfg.AuthenticationGrants)
 		control = New(ctx, ipfsClient, db)
 	})
 	return control

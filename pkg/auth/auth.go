@@ -7,13 +7,10 @@ import (
 	"strings"
 
 	"github.com/crossedbot/common/golang/server"
+	"github.com/crossedbot/simpleauth/pkg/grants"
 	middleware "github.com/crossedbot/simplemiddleware"
 
 	"github.com/crossedbot/axis/pkg/pins/models"
-)
-
-const (
-	GrantDelimiter = ","
 )
 
 var KeyFunc = func(authAddr string) middleware.KeyFunc {
@@ -47,15 +44,23 @@ var ErrFunc = func() middleware.ErrFunc {
 	}
 }
 
-var authGrants string
-var SetAuthGrants = func(grants []string) {
-	authGrants = strings.Join(grants, GrantDelimiter)
+var authGrants grants.Grant
+var SetAuthGrants = func(grantStrs []string) error {
+	err := grants.SetCustomGrants(grantStrs)
+	if err != nil {
+		return err
+	}
+	s := strings.Join(grantStrs, grants.GrantDelimiter)
+	authGrants, err = grants.ToGrant(s)
+	authGrants = authGrants.Clean()
+	return err
 }
 
 func Authorize(handler server.Handler) server.Handler {
 	h := func(w http.ResponseWriter, r *http.Request, p server.Parameters) {
-		if len(authGrants) > 0 {
-			if err := ContainsGrant(r); err != nil {
+		if authGrants != grants.GrantUnknown {
+			err := grants.ContainsGrant(authGrants, r)
+			if err != nil {
 				server.JsonResponse(w, models.NewFailure(
 					server.ErrUnauthorizedCode,
 					ErrUserForbidden.Error(),
@@ -66,20 +71,4 @@ func Authorize(handler server.Handler) server.Handler {
 		handler(w, r, p)
 	}
 	return middleware.Authorize(h)
-}
-
-func ContainsGrant(r *http.Request) error {
-	reqGrantStr, ok := r.Context().Value(middleware.ClaimGrant).(string)
-	if !ok {
-		return middleware.ErrGrantDataType
-	}
-	reqGrantStr = strings.ToLower(reqGrantStr)
-	authGrants = strings.ToLower(authGrants)
-	a := strings.Split(reqGrantStr, GrantDelimiter)
-	b := strings.Split(authGrants, GrantDelimiter)
-	contains, ok := Contains(a, b)
-	if !ok || !contains {
-		return ErrRequestGrant
-	}
-	return nil
 }

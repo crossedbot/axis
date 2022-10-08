@@ -29,4 +29,4 @@ COPY --from=gobuilder /go/bin/pins ./bin/pins
 COPY ./scripts/run.bash ./bin/run-pins
 
 EXPOSE 7070
-ENTRYPOINT [ "run-pins", "-p", "7070", "-d", "redis:6379", "-i", "/dns4/ipfs/tcp/9094", "-a", "http://simpleauth:8080/.well-known/jwks.json" ]
+ENTRYPOINT [ "run-pins", "-p", "7070", "-d", "redis:6379", "-i", "/dns4/ipfs/tcp/9094", "-a", "http://simpleauth:8080/.well-known/jwks.json", "-g", "authenticated" ]
