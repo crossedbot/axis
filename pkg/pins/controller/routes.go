@@ -20,35 +20,35 @@ type Route struct {
 var Routes = []Route{
 	// GetPin
 	Route{
-		auth.Authenticate(GetPin),
+		auth.Authorize(GetPin),
 		http.MethodGet,
 		"/pins/:id",
 		[]server.ResponseSetting{},
 	},
 	// FindPins
 	Route{
-		auth.Authenticate(FindPins),
+		auth.Authorize(FindPins),
 		http.MethodGet,
 		"/pins",
 		[]server.ResponseSetting{},
 	},
 	// CreatePin
 	Route{
-		auth.Authenticate(CreatePin),
+		auth.Authorize(CreatePin),
 		http.MethodPost,
 		"/pins",
 		[]server.ResponseSetting{},
 	},
 	// UpdatePin
 	Route{
-		auth.Authenticate(UpdatePin),
+		auth.Authorize(UpdatePin),
 		http.MethodPut,
 		"/pins/:id",
 		[]server.ResponseSetting{},
 	},
 	// UpdatePin (POST alternative)
 	Route{
-		auth.Authenticate(UpdatePin),
+		auth.Authorize(UpdatePin),
 		// XXX POST for compatibility with existing pinning api specs
 		http.MethodPost,
 		"/pins/:id",
@@ -56,14 +56,14 @@ var Routes = []Route{
 	},
 	// PatchPin
 	Route{
-		auth.Authenticate(PatchPin),
+		auth.Authorize(PatchPin),
 		http.MethodPatch,
 		"/pins/:id",
 		[]server.ResponseSetting{},
 	},
 	// RemovePin
 	Route{
-		auth.Authenticate(RemovePin),
+		auth.Authorize(RemovePin),
 		http.MethodDelete,
 		"/pins/:id",
 		[]server.ResponseSetting{},

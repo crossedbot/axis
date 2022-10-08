@@ -9,9 +9,11 @@ import (
 	"time"
 
 	"github.com/crossedbot/common/golang/config"
+	middleware "github.com/crossedbot/simplemiddleware"
 	"github.com/google/uuid"
 	clusterapi "github.com/ipfs-cluster/ipfs-cluster/api"
 	cluster "github.com/ipfs-cluster/ipfs-cluster/api/rest/client"
+	ipfscid "github.com/ipfs/go-cid"
 	ma "github.com/multiformats/go-multiaddr"
 
 	"github.com/crossedbot/axis/pkg/auth"
@@ -52,15 +54,17 @@ type Controller interface {
 // controller implements the Controller interface
 type controller struct {
 	ctx     context.Context
+	client  cluster.Client
 	db      pinsdb.Pins
 	pinner  pinner.Pinner
 	watcher pinwatcher.PinWatcher
 }
 
 type Config struct {
-	DatabaseAddr        string `toml:"database_addr"`
-	AuthenticatorAddr   string `toml:"authenticator_addr"`
-	DropDatabaseOnStart bool   `toml:"drop_database_on_start"`
+	DatabaseAddr         string   `toml:"database_addr"`
+	AuthenticatorAddr    string   `toml:"authenticator_addr"`
+	AuthenticationGrants []string `toml:"authentication_grants"`
+	DropDatabaseOnStart  bool     `toml:"drop_database_on_start"`
 
 	// IPFS configuration
 	IpfsClusterSsl          bool   `toml:"ipfs_cluster_ssl"`
@@ -70,23 +74,31 @@ type Config struct {
 	IpfsClusterTimeout      int    `toml:"ipfs_cluster_timeout"` // in seconds
 }
 
-// control is a singleton of a Controller and can be accessed via the V1
+// control is a singleton of a Controller and can be accessed via the Ctrl
 // function
 var control Controller
 var controllerOnce sync.Once
-var V1 = func() Controller {
+var Ctrl = func() Controller {
 	// initialize the controller only once
 	controllerOnce.Do(func() {
 		var cfg Config
 		if err := config.Load(&cfg); err != nil {
 			panic(err)
 		}
+		if len(cfg.AuthenticationGrants) > 0 {
+			err := auth.SetAuthGrants(cfg.AuthenticationGrants)
+			if err != nil {
+				panic(fmt.Errorf(
+					"Controller: failed to set custom authentication grants with error: %s",
+					err,
+				))
+			}
+		}
 		ctx := context.Background()
 		db, err := pinsdb.New(ctx, cfg.DatabaseAddr, cfg.DropDatabaseOnStart)
 		if err != nil {
 			panic(fmt.Errorf(
-				"Controller: failed to connect to database at "+
-					"address ('%s') with error: %s",
+				"Controller: failed to connect to database at address ('%s') with error: %s",
 				cfg.DatabaseAddr, err,
 			))
 		}
@@ -104,7 +116,14 @@ var V1 = func() Controller {
 			ProtectorKey: cfg.IpfsClusterProtectorKey,
 			Timeout:      time.Duration(cfg.IpfsClusterTimeout) * time.Second,
 		})
-		auth.SetAuthenticatorAddr(cfg.AuthenticatorAddr)
+		if err != nil {
+			panic(fmt.Errorf(
+				"Controller: failed to create client for IPFS cluster ('%s') with error %s",
+				cfg.IpfsClusterApiAddr, err,
+			))
+		}
+		middleware.SetKeyFunc(auth.KeyFunc(cfg.AuthenticatorAddr))
+		middleware.SetErrFunc(auth.ErrFunc())
 		control = New(ctx, ipfsClient, db)
 	})
 	return control
@@ -115,6 +134,7 @@ var V1 = func() Controller {
 func New(ctx context.Context, client cluster.Client, db pinsdb.Pins) Controller {
 	return &controller{
 		ctx:     ctx,
+		client:  client,
 		db:      db,
 		pinner:  pinner.New(ctx, client),
 		watcher: pinwatcher.New(ctx, client, db),
@@ -155,6 +175,7 @@ func (c *controller) FindPins(
 }
 
 func (c *controller) GetPin(uid, id string) (models.PinStatus, error) {
+	c.UpdatePinStatus(uid, id)
 	// retrieve pin from datastore
 	ps, err := c.db.Get(id)
 	if err == pinsdb.ErrNotFound {
@@ -220,28 +241,39 @@ func (c *controller) PatchPin(uid, id string, pin models.Pin) (models.PinStatus,
 }
 
 func (c *controller) RemovePin(uid, id string) error {
-	ps, err := c.GetPin(uid, id)
+	ps, err := c.db.Get(id)
 	if err != nil {
 		return err
 	}
-	pins, err := c.FindPins(
-		uid,
-		[]string{ps.Pin.Cid},
-		"", "", "",
-		models.TextMatchExact,
-		[]models.Status{}, 10,
-	)
-	if err != nil {
-		return err
-	}
-	if pins.Count == 1 {
-		// Remove pin from IPFS if no one else is tracking it
-		if err := c.pinner.Remove(ps.Pin.Cid); err != nil {
-			return err
-		}
-	}
+	c.pinner.Remove(ps.Pin.Cid)
 	if err := c.db.Delete(id); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (c *controller) UpdatePinStatus(uid, id string) error {
+	ps, err := c.db.Get(id)
+	if err != nil {
+		return err
+	}
+	prevStatus := ps.Status
+	currStatus := prevStatus
+	cid, err := ipfscid.Decode(ps.Pin.Cid)
+	if err != nil {
+		return err
+	}
+	gblPinInfo, err := c.client.Status(c.ctx, clusterapi.NewCid(cid), true)
+	if err != nil {
+		return err
+	}
+	for _, pinInfo := range gblPinInfo.PeerMap {
+		currStatus = pinInfo.Status.String()
+	}
+	if currStatus != prevStatus {
+		c.db.Patch(ps.Id, map[string]interface{}{
+			"status": currStatus,
+		})
 	}
 	return nil
 }

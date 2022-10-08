@@ -1,12 +1,14 @@
 package controller
 
 import (
+	"context"
 	"strconv"
 	"testing"
 	"time"
 
 	"github.com/golang/mock/gomock"
 	clusterapi "github.com/ipfs-cluster/ipfs-cluster/api"
+	ipfscid "github.com/ipfs/go-cid"
 	"github.com/stretchr/testify/require"
 
 	"github.com/crossedbot/axis/pkg/mocks"
@@ -78,6 +80,9 @@ func TestGetPin(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 	mockdb := mocks.NewMockPins(mockCtrl)
+	mockdb.EXPECT().
+		Get(expected.Id).
+		Return(expected, nil)
 	mockdb.EXPECT().
 		Get(expected.Id).
 		Return(expected, nil)
@@ -211,19 +216,12 @@ func TestRemovePin(t *testing.T) {
 			Meta:    models.Info{"uid": "myuserid"},
 		},
 	}
-	pins := models.Pins{Count: 1, Results: []models.PinStatus{expected}}
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 	mockdb := mocks.NewMockPins(mockCtrl)
 	mockdb.EXPECT().
 		Get(expected.Id).
 		Return(expected, nil)
-	mockdb.EXPECT().
-		Find(
-			[]string{expected.Pin.Cid}, []string{}, "",
-			int64(0), int64(0), models.TextMatchExact.String(), 10,
-		).
-		Return(pins, nil)
 	mockdb.EXPECT().
 		Delete(expected.Id).
 		Return(nil)
@@ -234,4 +232,39 @@ func TestRemovePin(t *testing.T) {
 	ctrl := &controller{db: mockdb, pinner: mockPinner}
 	err := ctrl.RemovePin("", expected.Id)
 	require.Nil(t, err)
+}
+
+func TestUpdatePinStatus(t *testing.T) {
+	ctx := context.Background()
+	ps := models.PinStatus{
+		Id:      "thispinsid",
+		Status:  "pinned",
+		Created: "1621000000",
+		Pin: models.Pin{
+			Cid:     "QmPAwR5un1YPJEF6iB7KvErDmAhiXxwL5J5qjA3Z9ceKqv",
+			Name:    "helloworld",
+			Origins: []string{"somewherefaraway"},
+			Meta:    models.Info{"uid": "myuserid"},
+		},
+	}
+	cid, err := ipfscid.Decode(ps.Pin.Cid)
+	require.Nil(t, err)
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+	mockdb := mocks.NewMockPins(mockCtrl)
+	mockdb.EXPECT().
+		Get(ps.Id).
+		Return(ps, nil)
+	mockIpfsClient := mocks.NewMockClient(mockCtrl)
+	mockIpfsClient.EXPECT().
+		Status(ctx, clusterapi.NewCid(cid), true).
+		Return(clusterapi.GlobalPinInfo{
+			PeerMap: map[string]clusterapi.PinInfoShort{
+				"peer": clusterapi.PinInfoShort{
+					Status: clusterapi.TrackerStatusPinned,
+				},
+			},
+		}, nil)
+	ctrl := &controller{ctx: ctx, db: mockdb, client: mockIpfsClient}
+	require.Nil(t, ctrl.UpdatePinStatus("", ps.Id))
 }

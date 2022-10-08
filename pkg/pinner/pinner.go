@@ -42,7 +42,7 @@ type pinner struct {
 	// Attributes
 	ReplicationFactorMin int
 	ReplicationFactorMax int
-	PinMode              clusterapi.PinMode
+	PinMode              clusterapi.PinMode // Recursive or direct pinning
 }
 
 func New(ctx context.Context, client cluster.Client) Pinner {
@@ -108,6 +108,9 @@ func (p *pinner) Delegates() ([]string, error) {
 }
 
 func (p *pinner) SetReplicationFactor(min, max int) error {
+	if min < 1 {
+		return fmt.Errorf("Minumum must be greater than zero")
+	}
 	if min > max {
 		return fmt.Errorf(
 			"Minimum is greater than the maximum replication",
