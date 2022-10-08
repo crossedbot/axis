@@ -7,6 +7,7 @@ package mocks
 import (
 	reflect "reflect"
 
+	database "github.com/crossedbot/axis/pkg/pins/database"
 	models "github.com/crossedbot/axis/pkg/pins/models"
 	gomock "github.com/golang/mock/gomock"
 )
@@ -49,18 +50,18 @@ func (mr *MockPinsMockRecorder) Delete(id interface{}) *gomock.Call {
 }
 
 // Find mocks base method.
-func (m *MockPins) Find(cids, statuses []string, name string, before, after int64, match string, limit int) (models.Pins, error) {
+func (m *MockPins) Find(cids, statuses []string, name string, before, after int64, match string, limit, offset int, sortBy *database.SortingKey, meta models.Info) (models.Pins, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Find", cids, statuses, name, before, after, match, limit)
+	ret := m.ctrl.Call(m, "Find", cids, statuses, name, before, after, match, limit, offset, sortBy, meta)
 	ret0, _ := ret[0].(models.Pins)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Find indicates an expected call of Find.
-func (mr *MockPinsMockRecorder) Find(cids, statuses, name, before, after, match, limit interface{}) *gomock.Call {
+func (mr *MockPinsMockRecorder) Find(cids, statuses, name, before, after, match, limit, offset, sortBy, meta interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*MockPins)(nil).Find), cids, statuses, name, before, after, match, limit)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*MockPins)(nil).Find), cids, statuses, name, before, after, match, limit, offset, sortBy, meta)
 }
 
 // Get mocks base method.

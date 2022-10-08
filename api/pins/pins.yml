@@ -26,6 +26,8 @@ paths:
         - $ref: '#/components/parameters/after'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/meta'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/sort'
       responses:
         '200':
           description: OK
@@ -469,6 +471,35 @@ components:
       required: false
       schema:
         $ref: '#/components/schemas/TextMatchingStrategy'
+    offset:
+      description: Return pin objects starting at given offset records
+      name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+        example: 100
+        default: 0
+    sort:
+      description: |
+        Return pin objects sorted by the given field. A unary negative may be
+        used to order by descending order.
+      name: sort
+      in: query
+      required: false
+      schema:
+        type: string
+        default: created
+        enum:
+          - cid
+          - created
+          - name
+          - status
+        uniqueItems: true
+        minItems: 1
+      style: form # ?sort:cid,name
+      explode: false
 
   responses:
     BadRequest:

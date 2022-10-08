@@ -50,18 +50,18 @@ func (mr *MockControllerMockRecorder) CreatePin(uid, pin interface{}) *gomock.Ca
 }
 
 // FindPins mocks base method.
-func (m *MockController) FindPins(uid string, cids []string, name, before, after string, match models.TextMatch, statuses []models.Status, limit int) (models.Pins, error) {
+func (m *MockController) FindPins(uid string, cids []string, name, before, after string, match models.TextMatch, statuses []models.Status, limit, offset int, sortBy string, meta models.Info) (models.Pins, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindPins", uid, cids, name, before, after, match, statuses, limit)
+	ret := m.ctrl.Call(m, "FindPins", uid, cids, name, before, after, match, statuses, limit, offset, sortBy, meta)
 	ret0, _ := ret[0].(models.Pins)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FindPins indicates an expected call of FindPins.
-func (mr *MockControllerMockRecorder) FindPins(uid, cids, name, before, after, match, statuses, limit interface{}) *gomock.Call {
+func (mr *MockControllerMockRecorder) FindPins(uid, cids, name, before, after, match, statuses, limit, offset, sortBy, meta interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindPins", reflect.TypeOf((*MockController)(nil).FindPins), uid, cids, name, before, after, match, statuses, limit)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindPins", reflect.TypeOf((*MockController)(nil).FindPins), uid, cids, name, before, after, match, statuses, limit, offset, sortBy, meta)
 }
 
 // GetPin mocks base method.

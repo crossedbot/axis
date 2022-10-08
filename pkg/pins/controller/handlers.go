@@ -114,6 +114,47 @@ func FindPins(w http.ResponseWriter, r *http.Request, p server.Parameters) {
 			return
 		}
 	}
+	// get offset data parameter
+	offset := 0
+	if v := query.Get("offset"); v != "" {
+		var err error
+		offset, err = strconv.Atoi(v)
+		if err != nil {
+			server.JsonResponse(w, models.NewFailure(
+				models.ErrFailedConversionCode,
+				"offset is not an integer",
+			), http.StatusBadRequest)
+			return
+		}
+		if offset > MaxPinLimit {
+			server.JsonResponse(w, models.NewFailure(
+				models.ErrMaxPinLimitCode,
+				fmt.Sprintf(
+					"offset exceeds max limit [1 .. %d]",
+					MaxPinLimit,
+				),
+			), http.StatusBadRequest)
+			return
+		}
+	}
+	// get sort data parameter
+	sortBy := "created"
+	if v := query.Get("sort"); v != "" {
+		switch v {
+		case "cid":
+		case "created":
+		case "name":
+		case "status":
+		default:
+			// unknown sorting string
+			server.JsonResponse(w, models.NewFailure(
+				models.ErrUnknownSortStringCode,
+				fmt.Sprintf("Unknown sorting string: \"%s\"", v),
+			), http.StatusBadRequest)
+			return
+		}
+		sortBy = v
+	}
 	// get meta data parameter
 	meta := make(map[string]string)
 	if metaString := query.Get("meta"); metaString != "" {
@@ -128,7 +169,8 @@ func FindPins(w http.ResponseWriter, r *http.Request, p server.Parameters) {
 	pins, err := Ctrl().FindPins(
 		uid, cids, name,
 		before, after, match,
-		statuses, limit,
+		statuses, limit, offset,
+		sortBy, meta,
 	)
 	if err != nil {
 		server.JsonResponse(w, models.NewFailure(

@@ -11,6 +11,8 @@ const (
 	ErrFailedConversionCode
 	ErrUnknownStatusStringCode
 	ErrUnknownTextMatchStringCode
+	ErrUnknownSortStringCode
+	ErrUnknownFieldStringCode
 	ErrRequiredParamCode
 	ErrUnauthorizedCode
 	ErrProcessingRequestCode
@@ -22,6 +24,8 @@ var ErrorCodeStrings = map[int]string{
 	ErrMaxNameLimitCode:           "MAX_NAME_LIMIT",
 	ErrFailedConversionCode:       "FAILED_CONVERSION",
 	ErrUnknownStatusStringCode:    "UNKNOWN_STATUS_STRING",
+	ErrUnknownSortStringCode:      "UNKNOWN_SORT_STRING",
+	ErrUnknownFieldStringCode:     "UNKNOWN_FIELD_STRING",
 	ErrUnknownTextMatchStringCode: "UNKNOWN_MATCH_STRING",
 	ErrRequiredParamCode:          "REQUIRED_PARAM",
 	ErrUnauthorizedCode:           "UNAUTHORIZED",
