@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -37,7 +38,8 @@ type Controller interface {
 		name, before, after string,
 		match models.TextMatch,
 		statuses []models.Status,
-		limit int,
+		limit int, offset int,
+		sortBy string, meta models.Info,
 	) (models.Pins, error)
 	// GetPin returns the Pin for the given ID
 	GetPin(uid, id string) (models.PinStatus, error)
@@ -147,7 +149,8 @@ func (c *controller) FindPins(
 	name, before, after string,
 	match models.TextMatch,
 	statuses []models.Status,
-	limit int,
+	limit int, offset int,
+	sortBy string, meta models.Info,
 ) (models.Pins, error) {
 	var err error
 	ss := []string{}
@@ -170,8 +173,18 @@ func (c *controller) FindPins(
 				"'after' (%s) is not an integer", after)
 		}
 	}
+	sorting := &pinsdb.SortingKey{Field: "created", Ascending: true}
+	if sortBy != "" {
+		if strings.HasPrefix(sortBy, "-") {
+			sorting.Field = sortBy[1:]
+			sorting.Ascending = false
+		} else {
+			sorting.Field = sortBy
+		}
+	}
 	// retrieve pins from datastore
-	return c.db.Find(cids, ss, name, b, a, match.String(), limit)
+	return c.db.Find(cids, ss, name, b, a, match.String(), limit, offset,
+		sorting, meta)
 }
 
 func (c *controller) GetPin(uid, id string) (models.PinStatus, error) {

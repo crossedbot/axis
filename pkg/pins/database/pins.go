@@ -40,7 +40,9 @@ type Pins interface {
 		name string,
 		before, after int64,
 		match string,
-		limit int,
+		limit int, offset int,
+		sortBy *SortingKey,
+		meta models.Info,
 	) (models.Pins, error)
 	// Delete removes the Pin according to the given ID
 	Delete(id string) error
@@ -162,12 +164,19 @@ func (d *pins) Get(id string) (models.PinStatus, error) {
 	return parsePinStatusDoc(*doc), nil
 }
 
+type SortingKey struct {
+	Field     string
+	Ascending bool
+}
+
 func (d *pins) Find(
 	cids, statuses []string,
 	name string,
 	before, after int64,
 	match string,
-	limit int,
+	limit int, offset int,
+	sortBy *SortingKey,
+	meta models.Info,
 ) (models.Pins, error) {
 	raw := []string{}
 	if len(cids) > 0 {
@@ -215,13 +224,25 @@ func (d *pins) Find(
 		// filter by upper range
 		raw = append(raw, fmt.Sprintf("@created:[-inf (%d]", before))
 	}
+	if len(meta) > 0 {
+		var ss []string
+		keys := meta.Keys()
+		for _, k := range keys {
+			ss = append(ss, escapeString(fmt.Sprintf("%s:%s", k, meta[k])))
+		}
+		raw = append(raw, fmt.Sprintf("@meta:{%s}",
+			strings.Join(ss, "|")))
+	}
 	queryString := "*"
 	if len(raw) > 0 {
 		queryString = strings.Join(raw, " ")
 	}
 	q := redisearch.NewQuery(queryString)
 	if limit > 0 {
-		q.Limit(0, limit)
+		q.Limit(offset, limit)
+	}
+	if sortBy != nil {
+		q.SetSortBy(sortBy.Field, sortBy.Ascending)
 	}
 	docs, _, err := d.Client.Search(q)
 	if err != nil {

@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/crossedbot/axis/pkg/mocks"
+	pinsdb "github.com/crossedbot/axis/pkg/pins/database"
 	"github.com/crossedbot/axis/pkg/pins/match"
 	"github.com/crossedbot/axis/pkg/pins/models"
 )
@@ -23,7 +24,11 @@ func TestFindPins(t *testing.T) {
 	before := "1621039121"
 	after := "1620967121"
 	match := models.TextMatchExact
-	limit := 10
+	limit := 100
+	offset := 10
+	sortBy := &pinsdb.SortingKey{Field: "created", Ascending: true}
+	sortByStr := sortBy.Field
+	meta := models.Info{"uid": "myuserid"}
 	expected := models.Pins{
 		Count: 1,
 		Results: []models.PinStatus{{
@@ -34,7 +39,7 @@ func TestFindPins(t *testing.T) {
 				Cid:     "abc123",
 				Name:    "helloworld",
 				Origins: []string{"somewherefaraway"},
-				Meta:    models.Info{"uid": "myuserid"},
+				Meta:    meta,
 			},
 		}},
 	}
@@ -53,13 +58,15 @@ func TestFindPins(t *testing.T) {
 		Find(
 			cids, statusStrings, name,
 			b64, a64, match.String(), limit,
+			offset, sortBy, meta,
 		).
 		Return(expected, nil)
 	ctrl := &controller{db: mockdb}
 	actual, err := ctrl.FindPins(
 		"", cids, name, before,
 		after, match, statuses,
-		limit,
+		limit, offset, sortByStr,
+		meta,
 	)
 	require.Nil(t, err)
 	require.Equal(t, expected, actual)
