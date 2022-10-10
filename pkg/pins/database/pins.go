@@ -30,10 +30,13 @@ var (
 type Pins interface {
 	// Set adds or updates a Pin
 	Set(pinStatus models.PinStatus) error
+
 	// Patch patches the fields of a Pin according to the given ID
 	Patch(id string, fields map[string]interface{}) error
+
 	// Get returns the Pin status for a given ID
 	Get(id string) (models.PinStatus, error)
+
 	// Find returns a list of Pins for the given parameters
 	Find(
 		cids, statuses []string,
@@ -44,6 +47,7 @@ type Pins interface {
 		sortBy *SortingKey,
 		meta models.Info,
 	) (models.Pins, error)
+
 	// Delete removes the Pin according to the given ID
 	Delete(id string) error
 }
@@ -244,7 +248,7 @@ func (d *pins) Find(
 	if sortBy != nil {
 		q.SetSortBy(sortBy.Field, sortBy.Ascending)
 	}
-	docs, _, err := d.Client.Search(q)
+	docs, total, err := d.Client.Search(q)
 	if err != nil {
 		return models.Pins{}, err
 	}
@@ -254,6 +258,7 @@ func (d *pins) Find(
 	}
 	return models.Pins{
 		Count:   len(pins),
+		Total:   total,
 		Results: pins,
 	}, nil
 }
