@@ -65,5 +65,6 @@ type PinStatus struct {
 
 type Pins struct {
 	Count   int         `json:"count"`
+	Total   int         `json:"total"`
 	Results []PinStatus `json:"results"`
 }

@@ -230,11 +230,19 @@ components:
       type: object
       required:
         - count
+        - total
         - results
       properties:
         count:
           description: |
             The total number of pin objects that exist for passed query filters
+          type: integer
+          format: int32
+          minimum: 0
+          example: 1
+        total:
+          description: |
+            The total number of pin objects without filters
           type: integer
           format: int32
           minimum: 0
