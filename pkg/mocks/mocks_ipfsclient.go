@@ -10,9 +10,9 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	api "github.com/ipfs-cluster/ipfs-cluster/api"
-	go_ipfs_api "github.com/ipfs/go-ipfs-api"
-	go_ipfs_files "github.com/ipfs/go-ipfs-files"
-	peer "github.com/libp2p/go-libp2p-core/peer"
+	shell "github.com/ipfs/go-ipfs-api"
+	files "github.com/ipfs/go-ipfs-files"
+	peer "github.com/libp2p/go-libp2p/core/peer"
 )
 
 // MockClient is a mock of Client interface.
@@ -53,7 +53,7 @@ func (mr *MockClientMockRecorder) Add(ctx, paths, params, out interface{}) *gomo
 }
 
 // AddMultiFile mocks base method.
-func (m *MockClient) AddMultiFile(ctx context.Context, multiFileR *go_ipfs_files.MultiFileReader, params api.AddParams, out chan<- api.AddedOutput) error {
+func (m *MockClient) AddMultiFile(ctx context.Context, multiFileR *files.MultiFileReader, params api.AddParams, out chan<- api.AddedOutput) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddMultiFile", ctx, multiFileR, params, out)
 	ret0, _ := ret[0].(error)
@@ -141,10 +141,10 @@ func (mr *MockClientMockRecorder) ID(arg0 interface{}) *gomock.Call {
 }
 
 // IPFS mocks base method.
-func (m *MockClient) IPFS(arg0 context.Context) *go_ipfs_api.Shell {
+func (m *MockClient) IPFS(arg0 context.Context) *shell.Shell {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IPFS", arg0)
-	ret0, _ := ret[0].(*go_ipfs_api.Shell)
+	ret0, _ := ret[0].(*shell.Shell)
 	return ret0
 }
 
